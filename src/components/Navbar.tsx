@@ -71,7 +71,7 @@ const Navbar = () => {
         
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-background/98 backdrop-blur-md border-b border-border/50 py-6 px-4 animate-slide-up">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/50 py-6 px-4 animate-slide-up">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
@@ -83,15 +83,15 @@ const Navbar = () => {
                   {link.label}
                 </a>
               ))}
-              <Button variant="gold" size="lg" asChild className="mt-4">
+              <Button variant="goldOutline" size="default" asChild className="mt-4 w-fit">
                 <a 
                   href="https://www.instagram.com/11oncecl" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2"
                 >
-                  <Instagram className="w-5 h-5" />
-                  Síguenos en Instagram
+                  <Instagram className="w-4 h-4" />
+                  @11oncecl
                 </a>
               </Button>
             </div>

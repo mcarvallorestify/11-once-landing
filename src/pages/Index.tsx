@@ -1,13 +1,44 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Helmet } from "react-helmet-async";
+import Navbar from "@/components/Navbar";
+import Hero from "@/components/Hero";
+import MenuSection from "@/components/MenuSection";
+import TablesSection from "@/components/TablesSection";
+import AboutSection from "@/components/AboutSection";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Helmet>
+        <title>11ONCE Restobar | Smash Burgers & Comida Mexicana en Chile</title>
+        <meta 
+          name="description" 
+          content="Descubre 11ONCE Restobar: los mejores smash burgers 100% carne de sobrecostilla y auténtica comida mexicana. Tablas para compartir, ambiente urbano. ¡Ven a vivir la experiencia!" 
+        />
+        <meta name="keywords" content="restobar chile, smash burgers, comida mexicana, 11once, hamburguesas, burritos, nachos, tablas para compartir" />
+        <link rel="canonical" href="https://11once.cl" />
+        
+        {/* Open Graph */}
+        <meta property="og:title" content="11ONCE Restobar | Smash Burgers & Comida Mexicana" />
+        <meta property="og:description" content="Los mejores smash burgers y comida mexicana. Ambiente urbano y relajado para compartir con amigos." />
+        <meta property="og:type" content="restaurant" />
+        <meta property="og:locale" content="es_CL" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="11ONCE Restobar" />
+        <meta name="twitter:description" content="Smash Burgers & Comida Mexicana en Chile" />
+      </Helmet>
+      
+      <main className="min-h-screen bg-background">
+        <Navbar />
+        <Hero />
+        <MenuSection />
+        <TablesSection />
+        <AboutSection />
+        <Footer />
+      </main>
+    </>
   );
 };
 

@@ -14,17 +14,29 @@ const Footer = () => {
             <p className="text-muted-foreground text-lg mb-8">
               Ven a vivir la experiencia 11ONCE. Te esperamos con los brazos abiertos y la parrilla encendida.
             </p>
-            <Button variant="hero" size="xl" asChild>
-              <a 
-                href="https://www.instagram.com/11oncecl" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-3"
-              >
-                <Instagram className="w-6 h-6" />
-                Contáctanos por Instagram
-              </a>
-            </Button>
+            <Button
+  variant="hero"
+  size="xl"
+  asChild
+  className="w-full sm:w-auto max-w-full"
+>
+  <a
+    href="https://www.instagram.com/11oncecl"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="
+      flex items-center justify-center gap-2
+      whitespace-normal text-center
+      px-4
+    "
+  >
+    <Instagram className="w-5 h-5 shrink-0" />
+    <span className="text-sm sm:text-base">
+      Contáctanos por Instagram
+    </span>
+  </a>
+</Button>
+
           </div>
         </div>
       </div>
@@ -87,7 +99,7 @@ const Footer = () => {
             © {new Date().getFullYear()} 11ONCE Restobar. Todos los derechos reservados.
           </p>
           <p className="text-muted-foreground text-sm">
-            Hecho con 🔥 en Chile
+            Hecho por Restify SpA.
           </p>
         </div>
       </div>

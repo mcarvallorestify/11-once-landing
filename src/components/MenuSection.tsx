@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -9,13 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { Users } from "lucide-react";
 import { images } from "@/constants/images";
+import { getProducts, getCategories, formatPrice, type FudoProduct, type FudoCategory } from "@/services/fudoApi";
 
 interface MenuItem {
   name: string;
   description: string;
   price: string;
   highlight?: boolean;
-  image: string;
+  image: string | null;
 }
 
 interface MenuCategory {
@@ -35,85 +36,24 @@ interface TableItem {
   image: string;
 }
 
-const foodCategories: MenuCategory[] = [
-  {
+// Configuración de categorías con sus imágenes y subtítulos
+const categoryConfig: Record<string, { image: string; subtitle?: string }> = {
+  "Smash Burgers": { image: images.burgersmash, subtitle: "100% Carne de Sobrecostilla en Pan Brioche" },
+  "México Lindo": { image: images.mexicolindo, subtitle: "Auténticos Sabores Mexicanos" },
+  "Sandwich Especiales": { image: images.sandwich2, subtitle: "Todos vienen en Pan de Papa" },
+  "Sandwich Mechada": { image: images.sandwich1, subtitle: "Todos vienen en Pan Frika de 15 cms" },
+  "Papas ONCE": { image: images.papasonce, subtitle: "Nuestras Famosas Papas Cargadas" },
+  "Ensalada": { image: images.ensalada, subtitle: "Fresca y Deliciosa" },
+  "Pa' La Bendi": { image: images.palabendi, subtitle: "Para los Pequeños" },
+  "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial - Dos por el Precio de Uno" },
+  "Cócteles": { image: images.moscowmule, subtitle: "Mojitos y Moscow Mule" },
+  "Pisco y Gin": { image: images.ginkantal, subtitle: "Destilados Premium" },
+  "Whisky y Ron": { image: images.whiskyron, subtitle: "Espíritus Selectos" },
+  "Vinos y Sours": { image: images.copasangria, subtitle: "Sangrías y Sours Nacionales" },
+  "Spritz": { image: images.copa1, subtitle: "Aperitivos Refrescantes" },
+  "Cervezas y Bebidas": { image: images.bebida1, subtitle: "Chelas y Refrescos" },
+};
 
-    title: "Smash Burgers",
-    subtitle: "100% Carne de Sobrecostilla en Pan Brioche",
-    image: images.burgersmash,
-    items: [
-      { name: "El Que Sabe, Sabe", description: "Tomate, escarola fresca, pepinillo, cebolla morada", price: "$8.900", image: images.heroBurger },
-      { name: "Piscinazo", description: "Estilo brasileño, sumergido en queso cheddar fundido y tocino crocante", price: "$11.900", image: images.piscinazo },
-      { name: "Corazón Contento", description: "Queso cheddar, cebolla caramelizada y tocino crocante", price: "$10.900", highlight: true, image: images.heroBurger },
-      { name: "A Lo Maldito", description: "Triple smashburger, queso cheddar, queso gouda, champiñones salteados, cebolla caramelizada y tocino crocante", price: "$13.900", highlight: true, image: images.heroBurger },
-      { name: "De Las Mechas", description: "Combinación única de smashburger coronado con queso gouda, carne mechada, tomate y tocino crocante", price: "$13.900", image: images.heroBurger },
-      { name: "El Descriteriao", description: "Queso cheddar, cremosa salsa de pimienta negra, lechuga, tomate, pepinillo y cebolla morada", price: "$10.900", image: images.heroBurger },
-      { name: "Diente Por Diente", description: "Queso cheddar, salsa de champiñones al ajo cremoso, lechuga, tomate, pepinillos, cebolla morada", price: "$10.900", image: images.heroBurger },
-      { name: "Dios Me Libre", description: "Aros de cebolla crispy, salsa de rocoto agridulce, lechuga, tomate, pepinillo y cebolla morada", price: "$10.900", image: images.heroBurger },
-      { name: "Más Chileno", description: "Queso gouda, palta, pebre y lechuga", price: "$10.900", image: images.heroBurger },
-      { name: "La Joya", description: "Queso cheddar, tocino crocante y mix de pimentones y champiñones asados", price: "$10.900", image: images.heroBurger },
-      { name: "A Nadie Le Falta", description: "Burger vegana, queso vegano, cebolla morada y pepinillo", price: "$10.900", image: images.heroBurger },
-    ],
-  },
-  {
-    title: "México Lindo",
-    subtitle: "Auténticos Sabores Mexicanos",
-    image: images.mexicolindo,
-    items: [
-      { name: "Fajitas Chingonas", description: "Pollo, carne o mixta con vegetales salteados, palta, queso y salsas", price: "$8.900", image: images.mexicanSpread },
-      { name: "Burrito Cabrón", description: "Con frijoles, arroz mexicano, lechuga, tomate, palta y salsa", price: "$8.900", highlight: true, image: images.mexicanSpread },
-      { name: "Quesadillas Wey", description: "Pollo, carne mechada o mixta con queso, lechuga, tomate y palta", price: "$8.900", image: images.mexicanSpread },
-      { name: "Pinche Enchiladas", description: "Con frijoles refritos, arroz mexicano, lechuga, tomate y palta", price: "$10.500", image: images.mexicanSpread },
-      { name: "Nachos Cheddar", description: "Carne, salsa mexicana, queso cheddar, sour cream y palta", price: "Desde $23.000", image: images.mexicanSpread },
-    ],
-  },
-  {
-    title: "Sandwich Especiales",
-    subtitle: "Todos vienen en Pan de Papa",
-    image: images.sandwich2,
-    items: [
-      { name: "Entero Pollo", description: "Filete de pollo crispy con pepinillos y tomate", price: "$8.900", image: images.heroBurger },
-      { name: "Por La Boca Muere El Pez", description: "Caluga de pescado, lechuga, tomate y cebolla morada", price: "$10.900", image: images.heroBurger },
-      { name: "Vegans", description: "Croqueta de falafel, hummus, lechuga, tomate, cebolla morada y pepinillo", price: "$11.900", image: images.heroBurger },
-    ],
-  },
-  {
-    title: "Sandwich Mechada",
-    subtitle: "Todos vienen en Pan Frika de 15 cms",
-    image: images.sandwich1,
-    items: [
-      { name: "Elige Tu Favorito", description: "Italiana, Luco, Chacarero", price: "$11.900", image: images.heroBurger },
-      { name: "Mechada Griinga", description: "Queso gouda, tomate, tocino crocante y cebolla caramelizada", price: "$11.900", image: images.heroBurger },
-    ],
-  },
-  {
-    title: "Papas ONCE",
-    subtitle: "Nuestras Famosas Papas Cargadas",
-    image: images.papasonce,
-    items: [
-      { name: "Papas ONCE 600gr", description: "Papas rústicas con salsa de queso cheddar, carne mechada, tomate, tocino, ciboulette y salsa cilantro", price: "$9.900", highlight: true, image: images.loadedFries },
-      { name: "Papas ONCE 350gr", description: "Versión para uno con todos los toppings", price: "$6.900", image: images.loadedFries },
-    ],
-  },
-  {
-    title: "Ensalada",
-    subtitle: "Fresca y Deliciosa",
-    image: images.ensalada,
-    items: [
-      { name: "César ONCE", description: "Ensalada César al estilo de la casa", price: "$8.900", image: images.loadedFries },
-    ],
-  },
-  {
-    title: "Pa' La Bendi",
-    subtitle: "Para los Pequeños",
-    image: images.palabendi,
-    items: [
-      { name: "Hamburguesa Queso", description: "Hamburguesa con queso para los niños", price: "$7.900", image: images.heroBurger },
-      { name: "Hot Dog", description: "Hot dog clásico", price: "$4.900", image: images.heroBurger },
-      { name: "Nuggets", description: "6 unidades de nuggets", price: "$4.900", image: images.heroBurger },
-    ],
-  },
-];
 
 const tables: TableItem[] = [
   {
@@ -136,112 +76,188 @@ const tables: TableItem[] = [
   },
 ];
 
-const drinkCategories: MenuCategory[] = [
-  {
-    title: "Promo 2X",
-    subtitle: "Oferta Especial - Dos por el Precio de Uno",
-    image: images.promo2x,
-    items: [
-      { name: "Fernet", description: "2X", price: "$8.000", highlight: true, image: images.restaurantAmbiance },
-      { name: "Mistral 35", description: "2X", price: "$7.000", image: images.restaurantAmbiance },
-      { name: "Austral Calafate", description: "2X", price: "$6.000", image: images.restaurantAmbiance },
-      { name: "Mistral 40", description: "2X", price: "$8.000", image: images.restaurantAmbiance },
-      { name: "Gin Kantal", description: "2X", price: "$10.000", image: images.restaurantAmbiance },
-      { name: "Mojito Tradicional", description: "2X", price: "$9.000", image: images.restaurantAmbiance },
-      { name: "Mojito Sabores", description: "2X", price: "$9.900", image: images.restaurantAmbiance },
-      { name: "Ballantines", description: "2X", price: "$8.000", image: images.restaurantAmbiance },
-      { name: "Ramazzotti", description: "2X", price: "$8.000", image: images.restaurantAmbiance },
-      { name: "Pisco Sour", description: "2X", price: "$8.000", image: images.restaurantAmbiance },
-      { name: "Pisco Sour Sabor", description: "2X", price: "$8.500", image: images.restaurantAmbiance },
-      { name: "Johnnie Walker Red Label", description: "2X", price: "$10.000", image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Cócteles",
-    subtitle: "Mojitos y Moscow Mule",
-    image: images.moscowmule,
-    items: [
-      { name: "Mojito", description: "Tradicional con hierbabuena y limón", price: "$6.490", image: images.restaurantAmbiance },
-      { name: "Mojito Sabores", description: "Con sabores especiales", price: "$6.990", highlight: true, image: images.restaurantAmbiance },
-      { name: "Moscow Mule", description: "Vodka, jengibre y lima en vaso de cobre", price: "$7.900", highlight: true, image: images.restaurantAmbiance },
-      { name: "Moscow Jagger", description: "Moscow Mule con Jägermeister", price: "$8.900", image: images.restaurantAmbiance },
-      { name: "Jagger Pineapple", description: "Jägermeister con piña", price: "$8.900", image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Pisco y Gin",
-    subtitle: "Destilados Premium",
-    image: images.ginkantal,
-    items: [
-      { name: "Pisco Alto 35°", description: "Pisco nacional", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Pisco Nobel 40°", description: "Pisco premium", price: "$5.490", image: images.restaurantAmbiance },
-      { name: "Pisco Alto Transparente", description: "Pisco transparente", price: "$5.990", image: images.restaurantAmbiance },
-      { name: "Gin Kantal", description: "Gin nacional", price: "$6.490", image: images.restaurantAmbiance },
-      { name: "Tropical Berries", description: "Gin con frutos rojos", price: "$7.500", image: images.restaurantAmbiance },
-      { name: "Tropical Gin", description: "Gin tropical", price: "$7.500", image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Whisky y Ron",
-    subtitle: "Espíritus Selectos",
-    image: images.whiskyron,
-    items: [
-      { name: "Ballantines", description: "Whisky escocés", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Johnnie Walker Red Label", description: "Whisky escocés", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Jack Daniels", description: "Whisky americano", price: "$6.990", highlight: true, image: images.restaurantAmbiance },
-      { name: "Bacardi", description: "Ron blanco", price: "$6.000", image: images.restaurantAmbiance },
-      { name: "Barceló Añejo", description: "Ron añejo", price: "$6.500", image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Vinos y Sours",
-    subtitle: "Sangrías y Sours Nacionales",
-    image: images.copasangria,
-    items: [
-      { name: "Jarra Sangría", description: "Sangría para compartir", price: "$7.990", highlight: true, image: images.restaurantAmbiance },
-      { name: "Copa Sangría", description: "Sangría individual", price: "$3.990", image: images.restaurantAmbiance },
-      { name: "Copa Vino", description: "Preguntar variedad disponible", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Sour Nacional", description: "Sour tradicional", price: "$3.990", image: images.restaurantAmbiance },
-      { name: "Sour Maracuyá", description: "Sour con maracuyá", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Sour Menta", description: "Sour con menta", price: "$4.990", image: images.restaurantAmbiance },
-      { name: "Sour Menta Jengibre", description: "Sour con menta y jengibre", price: "$4.990", image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Spritz",
-    subtitle: "Aperitivos Refrescantes",
-    image: images.copa1,
-    items: [
-      { name: "Aperol", description: "Spritz clásico con Aperol", price: "$6.490", image: images.restaurantAmbiance },
-      { name: "Spritz Berries", description: "Spritz con frutos rojos", price: "$6.990", image: images.restaurantAmbiance },
-      { name: "Ramazzotti", description: "Spritz con Ramazzotti", price: "$6.490", image: images.restaurantAmbiance },
-      { name: "Aperol ONCE", description: "Spritz especial de la casa", price: "$6.990", highlight: true, image: images.restaurantAmbiance },
-    ],
-  },
-  {
-    title: "Cervezas y Bebidas",
-    subtitle: "Chelas y Refrescos",
-    image: images.bebida1,
-    items: [
-      { name: "Corona", description: "Cerveza mexicana", price: "$3.000", image: images.restaurantAmbiance },
-      { name: "Calafate", description: "Cerveza artesanal", price: "$3.200", image: images.restaurantAmbiance },
-      { name: "Calafate 500 CC", description: "Cerveza artesanal grande", price: "$3.990", highlight: true, image: images.restaurantAmbiance },
-      { name: "Austral Lager", description: "Cerveza nacional", price: "$3.200", image: images.restaurantAmbiance },
-      { name: "Kustman Miel", description: "Cerveza con miel", price: "$3.200", image: images.restaurantAmbiance },
-      { name: "Kustman Torobayo", description: "Cerveza especial", price: "$3.200", image: images.restaurantAmbiance },
-      { name: "Shop", description: "Cerveza nacional", price: "$3.000", image: images.restaurantAmbiance },
-      { name: "Jugos Naturales", description: "450cc", price: "$3.900", image: images.restaurantAmbiance },
-      { name: "Limonadas", description: "450cc", price: "$3.900", image: images.restaurantAmbiance },
-      { name: "Bebidas Lata", description: "350cc", price: "$2.000", image: images.restaurantAmbiance },
-    ],
-  },
-];
+// Función para mapear productos de la API a items del menú
+function mapProductsToMenuItems(products: FudoProduct[]): MenuItem[] {
+  return products.map(product => ({
+    name: product.name,
+    description: product.description || "",
+    price: formatPrice(product.price),
+    highlight: false, // Puedes ajustar la lógica para determinar highlights
+    image: product.image,
+  }));
+}
+
+// Función para crear un mapa de IDs de categoría a nombres de menú
+function createCategoryIdToMenuNameMap(categories: FudoCategory[]): Map<number, string> {
+  const idToMenuName = new Map<number, string>();
+  
+  // Mapeo directo de IDs a nombres de menú
+  const directMapping: Record<number, string> = {
+    5: "Smash Burgers",   // Hamburguesas
+    8: "México Lindo",     // Mexico Lindo
+    6: "Sandwich Especiales", // Sandwich Especiales
+    7: "Sandwich Mechada",    // Sandwich Mechada
+    10: "Papas ONCE",       // Papas Once
+    12: "Ensalada",         // Ensalada
+    13: "Pa' La Bendi",     // Pa La Bendi
+    18: "Promo 2X",         // Happy hours
+    14: "Cócteles",         // Cocktails
+    21: "Pisco y Gin",      // Destilados
+    20: "Cervezas y Bebidas", // Bar
+    15: "Cervezas y Bebidas", // Bebidas (subcategoría de Bar)
+    16: "Cervezas y Bebidas", // Jugos Naturales (subcategoría de Bar)
+    17: "Cervezas y Bebidas", // Chelas (subcategoría de Bar)
+    22: "Cervezas y Bebidas", // Mugtails (subcategoría de Bar)
+  };
+
+  // Primero, aplicar mapeo directo
+  Object.entries(directMapping).forEach(([id, menuName]) => {
+    idToMenuName.set(Number(id), menuName);
+  });
+
+  // Luego, procesar subcategorías (categorías con productCategoryId no null)
+  categories.forEach(category => {
+    if (category.productCategoryId !== null) {
+      // Si es una subcategoría, usar el mapeo del padre
+      const parentMenuName = idToMenuName.get(category.productCategoryId);
+      if (parentMenuName) {
+        idToMenuName.set(category.id, parentMenuName);
+      }
+    }
+  });
+
+  return idToMenuName;
+}
+
+// Función para organizar productos por categorías
+function organizeProductsByCategory(
+  products: FudoProduct[],
+  categories: FudoCategory[]
+): MenuCategory[] {
+  const categoryIdToMenuName = createCategoryIdToMenuNameMap(categories);
+  
+  // Agrupar productos por nombre de menú
+  const productsByMenuName = new Map<string, FudoProduct[]>();
+  
+  products.forEach(product => {
+    const menuName = categoryIdToMenuName.get(product.productCategoryId);
+    if (menuName) {
+      if (!productsByMenuName.has(menuName)) {
+        productsByMenuName.set(menuName, []);
+      }
+      productsByMenuName.get(menuName)!.push(product);
+    }
+  });
+
+  const foodCategoryNames = [
+    "Smash Burgers",
+    "México Lindo",
+    "Sandwich Especiales",
+    "Sandwich Mechada",
+    "Papas ONCE",
+    "Ensalada",
+    "Pa' La Bendi",
+  ];
+
+  const drinkCategoryNames = [
+    "Promo 2X",
+    "Cócteles",
+    "Pisco y Gin",
+    "Whisky y Ron",
+    "Vinos y Sours",
+    "Spritz",
+    "Cervezas y Bebidas",
+  ];
+
+  const allCategories: MenuCategory[] = [];
+
+  // Procesar categorías de comida
+  foodCategoryNames.forEach(categoryName => {
+    const categoryProducts = productsByMenuName.get(categoryName) || [];
+    if (categoryProducts.length > 0) {
+      const config = categoryConfig[categoryName];
+      allCategories.push({
+        title: categoryName,
+        subtitle: config?.subtitle,
+        image: config?.image || images.restaurantAmbiance,
+        items: mapProductsToMenuItems(categoryProducts),
+      });
+    }
+  });
+
+  // Procesar categorías de bebidas
+  drinkCategoryNames.forEach(categoryName => {
+    const categoryProducts = productsByMenuName.get(categoryName) || [];
+    if (categoryProducts.length > 0) {
+      const config = categoryConfig[categoryName];
+      allCategories.push({
+        title: categoryName,
+        subtitle: config?.subtitle,
+        image: config?.image || images.restaurantAmbiance,
+        items: mapProductsToMenuItems(categoryProducts),
+      });
+    }
+  });
+
+  return allCategories;
+}
 
 const MenuSection = () => {
   const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
+  const [foodCategories, setFoodCategories] = useState<MenuCategory[]>([]);
+  const [drinkCategories, setDrinkCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleImageClick = (image: string, title: string) => {
+  useEffect(() => {
+    async function loadMenuData() {
+      try {
+        const [products, categories] = await Promise.all([
+          getProducts(),
+          getCategories(),
+        ]);
+
+        const allCategories = organizeProductsByCategory(products, categories);
+        
+        const foodCategoryNames = [
+          "Smash Burgers",
+          "México Lindo",
+          "Sandwich Especiales",
+          "Sandwich Mechada",
+          "Papas ONCE",
+          "Ensalada",
+          "Pa' La Bendi",
+        ];
+
+        const drinkCategoryNames = [
+          "Promo 2X",
+          "Cócteles",
+          "Pisco y Gin",
+          "Whisky y Ron",
+          "Vinos y Sours",
+          "Spritz",
+          "Cervezas y Bebidas",
+        ];
+
+        const food = allCategories.filter(c => foodCategoryNames.includes(c.title));
+        const drinks = allCategories.filter(c => drinkCategoryNames.includes(c.title));
+
+        setFoodCategories(food);
+        setDrinkCategories(drinks);
+      } catch (error) {
+        console.error('Error al cargar el menú:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadMenuData();
+  }, []);
+
+  const handleImageClick = (image: string | null, title: string) => {
+    // Si la imagen es null, no mostrar nada
+    if (image) {
     setSelectedImage({ src: image, title });
+    }
   };
 
   return (
@@ -258,6 +274,11 @@ const MenuSection = () => {
         </div>
 
         {/* Food Categories */}
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-white text-lg">Cargando menú...</p>
+          </div>
+        ) : (
         <div className="space-y-20">
           {foodCategories.map((category, categoryIndex) => {
             // Special layout for Smash Burgers
@@ -292,7 +313,9 @@ const MenuSection = () => {
                       <Card 
                         key={item.name}
                         onClick={() => handleImageClick(item.image, item.name)}
-                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer ${
+                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
+                          item.image ? 'cursor-pointer' : 'cursor-default'
+                        } ${
                           item.highlight ? 'border-primary/30' : ''
                         }`}
                       >
@@ -375,7 +398,9 @@ const MenuSection = () => {
                     <Card 
                       key={item.name}
                       onClick={() => handleImageClick(item.image, item.name)}
-                      className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer ${
+                      className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
+                        item.image ? 'cursor-pointer' : 'cursor-default'
+                      } ${
                         item.highlight ? 'border-primary/30' : ''
                       }`}
                     >
@@ -410,6 +435,7 @@ const MenuSection = () => {
             );
           })}
         </div>
+        )}
 
         {/* Tables Section */}
         <div className="mt-20">
@@ -519,7 +545,9 @@ const MenuSection = () => {
                       <Card 
                         key={item.name}
                         onClick={() => handleImageClick(item.image, item.name)}
-                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer ${
+                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
+                          item.image ? 'cursor-pointer' : 'cursor-default'
+                        } ${
                           item.highlight ? 'border-primary/30' : ''
                         }`}
                       >

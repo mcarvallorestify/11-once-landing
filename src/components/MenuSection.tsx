@@ -291,7 +291,7 @@ const MenuSection = () => {
             // Special layout for Smash Burgers
             if (category.title === "Smash Burgers") {
               return (
-                <div key={category.title} className="space-y-12">
+                <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
                   {/* Centered Image and Title */}
                   <div className="flex flex-col items-center">
                         {category.image ? (
@@ -368,7 +368,7 @@ const MenuSection = () => {
 
             // Regular layout for other categories - usando grid layout
             return (
-              <div key={category.title} className="space-y-12">
+              <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
                 {/* Centered Image and Title */}
                 <div className="flex flex-col items-center">
                   {category.image ? (
@@ -451,7 +451,7 @@ const MenuSection = () => {
 
         {/* Tables Section */}
         {tables.length > 0 && (
-        <div className="mt-20">
+        <div id="tablas" className="mt-20">
           <div className="text-center mb-16">
             <span className="text-primary font-heading uppercase tracking-[0.3em] text-sm mb-4 block">
               Para Compartir
@@ -505,7 +505,7 @@ const MenuSection = () => {
         )}
 
         {/* Drinks Section */}
-        <div className="mt-20">
+        <div id="tragos" className="mt-20">
           <div className="text-center mb-16">
             <h2 className="font-display text-6xl md:text-7xl text-primary mb-4">
               Tragos
@@ -518,7 +518,7 @@ const MenuSection = () => {
           <div className="space-y-20">
             {drinkCategories.map((category) => {
               return (
-                <div key={category.title} className="space-y-12">
+                <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
                   {/* Centered Image and Title */}
                   <div className="flex flex-col items-center">
                       {category.image ? (

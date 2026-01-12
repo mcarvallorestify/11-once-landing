@@ -7,13 +7,24 @@ import { images } from "@/constants/images";
 
 const navLinks = [
   { label: "Inicio", href: "/", isHash: false },
-  { label: "Carta", href: "/#menu", isHash: true },
+  { label: "Carta", href: "/#menu", isHash: true, submenu: [
+    { label: "Menú almuerzo", href: "/#menú-almuerzo", isHash: true },
+    { label: "Smash Burgers", href: "/#smash-burgers", isHash: true },
+    { label: "México Lindo", href: "/#méxico-lindo", isHash: true },
+    { label: "Sandwich Especiales", href: "/#sandwich-especiales", isHash: true },
+    { label: "Sandwich Mechada", href: "/#sandwich-mechada", isHash: true },
+    { label: "Papas ONCE", href: "/#papas-once", isHash: true },
+    { label: "Ensalada", href: "/#ensalada", isHash: true },
+    { label: "Pa' La Bendi", href: "/#pa-la-bendi", isHash: true },
+    { label: "Bebestibles", href: "/#tragos", isHash: true },
+  ] },
   { label: "Sobre nosotros", href: "/sobre-nosotros", isHash: false },
 ];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCartaSubmenuOpen, setIsCartaSubmenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -135,7 +146,10 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button 
             className="md:hidden text-foreground p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            onClick={() => {
+              setIsMobileMenuOpen(!isMobileMenuOpen);
+              setIsCartaSubmenuOpen(false);
+            }}
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -147,6 +161,58 @@ const Navbar = () => {
           <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/50 py-6 px-4 animate-slide-up">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => {
+                if (link.submenu) {
+                  return (
+                    <div key={link.label}>
+                      <button
+                        onClick={() => setIsCartaSubmenuOpen(!isCartaSubmenuOpen)}
+                        className="font-heading text-lg uppercase tracking-wider text-white/90 hover:text-white transition-colors py-2 flex items-center justify-between w-full"
+                      >
+                        {link.label}
+                        <span className={`transform transition-transform ${isCartaSubmenuOpen ? 'rotate-180' : ''}`}>
+                          ▼
+                        </span>
+                      </button>
+                      {isCartaSubmenuOpen && (
+                        <div className="ml-4 mt-2 space-y-2">
+                          {link.submenu.map((subLink) => (
+                            <Link
+                              key={subLink.label}
+                              to={subLink.href}
+                              onClick={(e) => {
+                                setIsMobileMenuOpen(false);
+                                setIsCartaSubmenuOpen(false);
+                                if (subLink.isHash) {
+                                  e.preventDefault();
+                                  if (location.pathname !== "/") {
+                                    navigate("/");
+                                    setTimeout(() => {
+                                      const hash = subLink.href.split("#")[1];
+                                      const element = document.getElementById(hash);
+                                      if (element) {
+                                        element.scrollIntoView({ behavior: "smooth" });
+                                      }
+                                    }, 100);
+                                  } else {
+                                    const hash = subLink.href.split("#")[1];
+                                    const element = document.getElementById(hash);
+                                    if (element) {
+                                      element.scrollIntoView({ behavior: "smooth" });
+                                    }
+                                  }
+                                }
+                              }}
+                              className="block font-heading text-base uppercase tracking-wider text-white/70 hover:text-white transition-colors py-1"
+                            >
+                              {subLink.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
                   setIsMobileMenuOpen(false);
                   if (link.label === "Inicio" || link.label === "Sobre nosotros") {

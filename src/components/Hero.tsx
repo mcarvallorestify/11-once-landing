@@ -35,6 +35,7 @@ const Hero = () => {
             Smash Burgers • Comida Mexicana • Tablas para compartir • Tragos
           </p>
           
+          
           {/* CTA Buttons */}
           <div className="flex flex-col gap-4 justify-center items-center mb-12">
             <Button 

@@ -111,7 +111,8 @@ async function callFudo<T>(endpoint: string): Promise<T> {
 export async function getProducts(): Promise<FudoProduct[]> {
   try {
     const data = await callFudo<FudoProductsResponse>('products');
-    return data.products.filter(p => p.active);
+    // Filtrar solo productos activos (active === true)
+    return data.products.filter(p => p.active === true);
   } catch (error) {
     console.error('Error al obtener productos:', error);
     return [];

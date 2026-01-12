@@ -1,12 +1,16 @@
-import { Instagram, MapPin, Clock, Phone } from "lucide-react";
+import { useState } from "react";
+import { Instagram, MapPin, Clock, Phone, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { images } from "@/constants/images";
+import WorkWithUsModal from "@/components/WorkWithUsModal";
 
 interface FooterProps {
   hideCta?: boolean;
 }
 
 const Footer = ({ hideCta = false }: FooterProps) => {
+  const [isWorkWithUsModalOpen, setIsWorkWithUsModalOpen] = useState(false);
+
   return (
     <footer id="contacto" className="bg-card border-t border-border/30">
       {/* CTA Section */}
@@ -93,20 +97,29 @@ const Footer = ({ hideCta = false }: FooterProps) => {
             </div>
           </div>
           
-          {/* Social */}
+          {/* Enlaces */}
           <div className="space-y-4">
             <h4 className="font-heading text-lg uppercase tracking-wider text-foreground">
-              Síguenos
+              Enlaces
             </h4>
-            <a 
-              href="https://www.instagram.com/11oncecl" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
-            >
-              <Instagram className="w-6 h-6" />
-              <span className="font-medium">@11oncecl</span>
-            </a>
+            <div className="space-y-3">
+              <a 
+                href="https://www.instagram.com/11oncecl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+              >
+                <Instagram className="w-6 h-6" />
+                <span className="font-medium">@11oncecl</span>
+              </a>
+              <button
+                onClick={() => setIsWorkWithUsModalOpen(true)}
+                className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+              >
+                <Briefcase className="w-6 h-6" />
+                <span className="font-medium">Trabaja con nosotros</span>
+              </button>
+            </div>
             <p className="text-white text-sm">
               Siguenos para ver nuestras novedades, promociones y el día a día del restobar.
             </p>
@@ -123,6 +136,11 @@ const Footer = ({ hideCta = false }: FooterProps) => {
           </p>
         </div>
       </div>
+
+      <WorkWithUsModal
+        open={isWorkWithUsModalOpen}
+        onOpenChange={setIsWorkWithUsModalOpen}
+      />
     </footer>
   );
 };

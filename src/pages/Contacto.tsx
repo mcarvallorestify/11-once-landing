@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Send, Mail, Phone } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { images } from "@/constants/images";
+import { toast } from "@/hooks/use-toast";
 
 const Contacto = () => {
   const [formData, setFormData] = useState({
@@ -18,16 +19,48 @@ const Contacto = () => {
     phone: "",
     message: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Crear el mensaje para WhatsApp
-    const whatsappMessage = `Hola, mi nombre es ${formData.name}.\nEmail: ${formData.email}\nTeléfono: ${formData.phone}\n\nMensaje: ${formData.message}`;
-    const whatsappUrl = `https://wa.me/56975858539?text=${encodeURIComponent(whatsappMessage)}`;
-    window.open(whatsappUrl, "_blank");
-    
-    // Limpiar formulario
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    setIsLoading(true);
+
+    try {
+      const response = await fetch("https://11once.cl/correos/enviar.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: formData.name,
+          correo: formData.email,
+          numero: formData.phone,
+          mensaje: formData.message,
+        }),
+      });
+
+      const result = await response.text();
+
+      if (response.ok && result.trim() === "Ok") {
+        toast({
+          title: "¡Mensaje enviado!",
+          description: "Gracias por contactarnos. Te responderemos pronto.",
+        });
+        // Limpiar formulario
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        throw new Error(result || "Error al enviar el mensaje");
+      }
+    } catch (error) {
+      console.error("Error al enviar formulario:", error);
+      toast({
+        title: "Error al enviar",
+        description: "No se pudo enviar el mensaje. Por favor, intenta nuevamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -215,9 +248,19 @@ const Contacto = () => {
                       variant="hero"
                       size="lg"
                       className="w-full"
+                      disabled={isLoading}
                     >
-                      <Send className="w-4 h-4 mr-2" />
-                      Enviar Mensaje
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 mr-2" />
+                          Enviar Mensaje
+                        </>
+                      )}
                     </Button>
                   </form>
                 </div>

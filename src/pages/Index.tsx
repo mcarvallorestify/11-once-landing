@@ -5,6 +5,7 @@ import MenuSection from "@/components/MenuSection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ContestButton from "@/components/ContestButton";
 
 const Index = () => {
   return (
@@ -37,6 +38,7 @@ const Index = () => {
         <AboutSection />
         <Footer />
         <WhatsAppButton />
+        <ContestButton />
       </main>
     </>
   );

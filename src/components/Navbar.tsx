@@ -114,6 +114,11 @@ const Navbar = () => {
                 Realiza tu reserva
               </a>
             </Button>
+            <Button size="sm" asChild className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-heading uppercase tracking-wider hover:shadow-[0_4px_20px_rgba(255,193,7,0.4)] hover:scale-105">
+              <Link to="/concurso">
+                Concurso Miami
+              </Link>
+            </Button>
             <Button variant="whiteOutline" size="sm" asChild>
               <a 
                 href="https://www.instagram.com/11oncecl" 
@@ -194,6 +199,11 @@ const Navbar = () => {
                 >
                   Realiza tu reserva
                 </a>
+              </Button>
+              <Button size="default" asChild className="mt-2 w-fit bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white font-heading uppercase tracking-wider hover:shadow-[0_4px_20px_rgba(255,193,7,0.4)] hover:scale-105">
+                <Link to="/concurso">
+                  Concurso Miami
+                </Link>
               </Button>
               <Button variant="whiteOutline" size="default" asChild className="mt-2 w-fit">
                 <a 

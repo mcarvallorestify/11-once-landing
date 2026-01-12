@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Instagram, MapPin, Clock, Phone, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { images } from "@/constants/images";
@@ -112,6 +113,15 @@ const Footer = ({ hideCta = false }: FooterProps) => {
                 <Instagram className="w-6 h-6" />
                 <span className="font-medium">@11oncecl</span>
               </a>
+              <Link
+                to="/concurso"
+                className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                <span className="font-medium">Concurso Miami</span>
+              </Link>
               <button
                 onClick={() => setIsWorkWithUsModalOpen(true)}
                 className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"

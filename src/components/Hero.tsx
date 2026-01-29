@@ -93,9 +93,7 @@ const Hero = () => {
             <div className="flex items-start gap-2">
               <Clock className="w-4 h-4 text-primary mt-0.5" />
               <div className="flex flex-col text-sm">
-                <span className="text-white">Martes a Jueves de 12:00 a 00:00 hrs.</span>
-                <span className="text-white">Viernes y Sabado de 12:00 a 02:00 hrs.</span>
-                <span className="text-white">Domingo de 12:00 a 18:00 hrs.</span>
+                <span className="text-white">Martes a Viernes de 18:00 a 21:00 hrs.</span>
               </div>
             </div>
           </div>

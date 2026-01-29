@@ -45,7 +45,7 @@ const categoryConfig: Record<string, { image?: string; subtitle?: string; otrosu
   "Menú almuerzo": { image: "", subtitle: "Menú del día — Almuerzo" },
 
   "México Lindo": { image: images.mexicolindo, subtitle: "Auténticos Sabores Mexicanos" },
-  "Sandwich Especiales": { image: images.sandwich2, subtitle: "Todos vienen en Pan de Papa" },
+  "Sandwich Especiales": { image: images.sandwich2, subtitle: "Todos vienen en pan brioche" },
   "Sandwich Mechada": { image: images.sandwich1, subtitle: "Todos vienen en Pan Frika de 15 cms" },
   "Tablas Para Picar Con Ganas": { image: images.tfilete, subtitle: "Perfectas para compartir con amigos" },
   "Papas ONCE": { image: images.papasonce, subtitle: "Nuestras Famosas Papas Cargadas" },

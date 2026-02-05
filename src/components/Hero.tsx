@@ -80,7 +80,7 @@ const Hero = () => {
           </div>
           
           {/* Quick Info */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-start text-base text-white mb-20">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-base text-white mb-20">
             <a 
               href="https://www.google.com/maps/search/?api=1&query=Chorrillos+775,+Quilpué"
               target="_blank"
@@ -91,9 +91,14 @@ const Hero = () => {
               <span className="text-white">Chorrillos 775, Quilpué</span>
             </a>
             <div className="flex items-start gap-2">
-              <Clock className="w-4 h-4 text-primary mt-0.5" />
-              <div className="flex flex-col text-sm">
-                <span className="text-white">Martes a Viernes de 18:00 a 21:00 hrs.</span>
+              <Clock className="w-4 h-4 text-primary mt-1" />
+              <div className="flex flex-col text-base">
+                <span className="text-white font-semibold">Martes a Jueves de 12:00 a 00:00 hrs.</span>
+                <span className="text-white text-sm">Cocina cierra 23:00 hrs. • Barra cierra 23:30 hrs.</span>
+                <span className="text-white font-semibold mt-2">Viernes y Sabado de 12:00 a 02:00 hrs.</span>
+                <span className="text-white text-sm">Cocina cierra 01:00 hrs. • Barra cierra 01:30 hrs.</span>
+                <span className="text-white font-semibold mt-2">Domingo de 12:00 a 18:00 hrs.</span>
+                <span className="text-white text-sm">Cocina cierra 17:00 hrs. • Barra cierra 17:30 hrs.</span>
               </div>
             </div>
           </div>

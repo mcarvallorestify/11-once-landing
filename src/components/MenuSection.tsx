@@ -51,7 +51,7 @@ const categoryConfig: Record<string, { image?: string; subtitle?: string; otrosu
   "Papas ONCE": { image: images.papasonce, subtitle: "Nuestras Famosas Papas Cargadas" },
   "Ensalada": { image: images.ensalada, subtitle: "Fresca y Deliciosa" },
   "Pa' La Bendi": { image: images.palabendi, subtitle: "Para los Pequeños" },
-  "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial" },
+  "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial - De Martes a Viernes de 18:00 a 21:00 hrs" },
   "Cócteles": { image: images.moscowmule, subtitle: "Mojitos y Moscow Mule" },
   "Pisco y Gin": { image: images.ginkantal, subtitle: "Destilados Premium" },
   "Whisky y Ron": { image: images.whiskyron, subtitle: "Espíritus Selectos" },

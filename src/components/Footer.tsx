@@ -113,7 +113,6 @@ const Footer = ({ hideCta = false }: FooterProps) => {
                 <Instagram className="w-6 h-6" />
                 <span className="font-medium">@11oncecl</span>
               </a>
-              {/* Eliminado enlace y texto Concurso Miami */}
               <button
                 onClick={() => setIsWorkWithUsModalOpen(true)}
                 className="flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"

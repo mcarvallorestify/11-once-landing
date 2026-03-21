@@ -125,7 +125,6 @@ const Navbar = () => {
                 Realiza tu reserva
               </a>
             </Button>
-            {/* Botón Concurso Miami eliminado */}
             <Button variant="whiteOutline" size="sm" asChild>
               <a 
                 href="https://www.instagram.com/11oncecl" 
@@ -262,7 +261,6 @@ const Navbar = () => {
                   Realiza tu reserva
                 </a>
               </Button>
-              {/* Botón Concurso Miami eliminado */}
               <Button variant="whiteOutline" size="default" asChild className="mt-2 w-fit">
                 <a 
                   href="https://www.instagram.com/11oncecl" 

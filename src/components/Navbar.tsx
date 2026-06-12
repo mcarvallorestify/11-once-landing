@@ -17,7 +17,10 @@ const navLinks = [
     { label: "Chorrillana", href: "/#chorrillana", isHash: true },
     { label: "Ensalada", href: "/#ensalada", isHash: true },
     { label: "Pa' La Bendi", href: "/#pa-la-bendi", isHash: true },
+    { label: "Tablas Para Picar", href: "/#tablas", isHash: true },
     { label: "Cafetería", href: "/#cafeteria", isHash: true },
+    { label: "Promo 2X", href: "/#promo-2x", isHash: true },
+    { label: "Cócteles", href: "/#cócteles", isHash: true },
     { label: "Bebestibles", href: "/#tragos", isHash: true },
   ] },
   { label: "Sobre nosotros", href: "/sobre-nosotros", isHash: false },
@@ -155,7 +158,7 @@ const Navbar = () => {
         
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/50 py-6 px-4 animate-slide-up">
+          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-b border-border/50 py-6 px-4 animate-slide-up max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain scrollbar-brand">
             <div className="flex flex-col gap-4">
               {navLinks.map((link) => {
                 if (link.submenu) {
@@ -171,7 +174,7 @@ const Navbar = () => {
                         </span>
                       </button>
                       {isCartaSubmenuOpen && (
-                        <div className="ml-4 mt-2 space-y-2">
+                        <div className="ml-2 mt-2 space-y-2 border-l border-primary/25 pl-3 pr-2 pb-1">
                           {link.submenu.map((subLink) => (
                             <Link
                               key={subLink.label}
@@ -199,7 +202,7 @@ const Navbar = () => {
                                   }
                                 }
                               }}
-                              className="block font-heading text-base uppercase tracking-wider text-white/70 hover:text-white transition-colors py-1"
+                              className="block font-heading text-base uppercase tracking-wider text-white/70 hover:text-primary transition-colors py-1"
                             >
                               {subLink.label}
                             </Link>

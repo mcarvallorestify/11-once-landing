@@ -109,6 +109,39 @@
   html {
     scroll-behavior: smooth;
   }
+
+  html,
+  .scrollbar-brand {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.5) hsl(var(--muted) / 0.4);
+  }
+
+  html::-webkit-scrollbar,
+  .scrollbar-brand::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  html::-webkit-scrollbar-track,
+  .scrollbar-brand::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.35);
+    border-radius: 9999px;
+    margin-block: 6px;
+  }
+
+  html::-webkit-scrollbar-thumb,
+  .scrollbar-brand::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      hsl(var(--primary) / 0.55) 0%,
+      hsl(var(--primary) / 0.35) 100%
+    );
+    border-radius: 9999px;
+  }
+
+  html::-webkit-scrollbar-thumb:hover,
+  .scrollbar-brand::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.75);
+  }
 }
 
 @layer components {

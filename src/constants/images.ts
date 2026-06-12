@@ -22,6 +22,8 @@ import copa1 from "@/assets/copa1.jpg";
 import bebida1 from "@/assets/bebida1.jpg";
 import logoLB from "@/assets/logoLB.png";
 import logoLB2 from "@/assets/logoLB2.png";
+import cafeteria from "@/assets/cafeteria.jpg";
+import chorrillana from "@/assets/chorrillana.jpg";
 
 export const images = {
   burgersmash,
@@ -47,5 +49,7 @@ export const images = {
   bebida1,
   logoLB,
   logoLB2,
+  cafeteria,
+  chorrillana,
 };
 

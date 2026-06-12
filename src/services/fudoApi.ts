@@ -125,7 +125,7 @@ export async function getProducts(): Promise<FudoProduct[]> {
 
 export async function getCategories(): Promise<FudoCategory[]> {
   try {
-    const data = await callFudo<FudoCategoriesResponse>('productCategories');
+    const data = await callFudo<FudoCategoriesResponse>('product-categories');
     return data.productCategories;
   } catch (error) {
     console.error('Error al obtener categorías:', error);

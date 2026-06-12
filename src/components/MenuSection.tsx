@@ -49,15 +49,17 @@ const categoryConfig: Record<string, { image?: string; subtitle?: string; otrosu
   "Sandwich Mechada": { image: images.sandwich1, subtitle: "Todos vienen en Pan Frika de 15 cms" },
   "Tablas Para Picar Con Ganas": { image: images.tfilete, subtitle: "Perfectas para compartir con amigos" },
   "Papas ONCE": { image: images.papasonce, subtitle: "Nuestras Famosas Papas Cargadas" },
+  "Chorrillana": { image: images.chorrillana, subtitle: "El clásico chileno para compartir" },
   "Ensalada": { image: images.ensalada, subtitle: "Fresca y Deliciosa" },
   "Pa' La Bendi": { image: images.palabendi, subtitle: "Para los Pequeños" },
-  "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial - De Martes a Viernes de 18:00 a 21:00 hrs" },
+  "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial - De Martes a Jueves Todo el día y Viernes de 18:00 a 21:00 hrs" },
   "Cócteles": { image: images.moscowmule, subtitle: "Mojitos y Moscow Mule" },
   "Pisco y Gin": { image: images.ginkantal, subtitle: "Destilados Premium" },
   "Whisky y Ron": { image: images.whiskyron, subtitle: "Espíritus Selectos" },
   "Vinos y Sours": { image: images.copasangria, subtitle: "Sangrías y Sours Nacionales" },
   "Spritz": { image: images.copa1, subtitle: "Aperitivos Refrescantes" },
   "Cervezas y Bebidas": { image: images.bebida1, subtitle: "Chelas y Refrescos" },
+  "Cafetería": { image: images.cafeteria, subtitle: "Café y Té" },
 };
 
 
@@ -95,6 +97,7 @@ function createCategoryIdToMenuNameMap(categories: FudoCategory[]): Map<number, 
     7: "Sandwich Mechada",    // Sandwich Mechada
     9: "Tablas Para Picar Con Ganas", // Tablas Para Picar Con Ganas
     10: "Papas ONCE",       // Papas Once
+    30: "Chorrillana",      // Chorrillana
     12: "Ensalada",         // Ensalada
     13: "Pa' La Bendi",     // Pa La Bendi
     18: "Promo 2X",         // Happy hours
@@ -106,6 +109,7 @@ function createCategoryIdToMenuNameMap(categories: FudoCategory[]): Map<number, 
     17: "Cervezas y Bebidas", // Chelas (subcategoría de Bar)
     22: "Cervezas y Bebidas", // Mugtails (subcategoría de Bar)
     24: "Menú almuerzo",
+    29: "Cafetería",
   };
 
   // Primero, aplicar mapeo directo
@@ -154,6 +158,7 @@ function organizeProductsByCategory(
     "Sandwich Especiales",
     "Sandwich Mechada",
     "Papas ONCE",
+    "Chorrillana",
     "Ensalada",
     "Pa' La Bendi",
   ];
@@ -167,6 +172,8 @@ function organizeProductsByCategory(
     "Spritz",
     "Cervezas y Bebidas",
   ];
+
+  const cafeteriaCategoryNames = ["Cafetería"];
 
   const allCategories: MenuCategory[] = [];
 
@@ -199,12 +206,27 @@ function organizeProductsByCategory(
     }
   });
 
+  // Procesar cafetería (id 29)
+  cafeteriaCategoryNames.forEach(categoryName => {
+    const categoryProducts = productsByMenuName.get(categoryName) || [];
+    if (categoryProducts.length > 0) {
+      const config = categoryConfig[categoryName];
+      allCategories.push({
+        title: categoryName,
+        subtitle: config?.subtitle,
+        image: config?.image,
+        items: mapProductsToMenuItems(categoryProducts),
+      });
+    }
+  });
+
   return allCategories;
 }
 
 const MenuSection = () => {
   const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
   const [foodCategories, setFoodCategories] = useState<MenuCategory[]>([]);
+  const [cafeteriaCategories, setCafeteriaCategories] = useState<MenuCategory[]>([]);
   const [drinkCategories, setDrinkCategories] = useState<MenuCategory[]>([]);
   const [tables, setTables] = useState<TableItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -230,6 +252,7 @@ const MenuSection = () => {
           "Sandwich Especiales",
           "Sandwich Mechada",
           "Papas ONCE",
+          "Chorrillana",
           "Ensalada",
           "Pa' La Bendi",
         ];
@@ -244,10 +267,14 @@ const MenuSection = () => {
           "Cervezas y Bebidas",
         ];
 
+        const cafeteriaCategoryNames = ["Cafetería"];
+
         const food = allCategories.filter(c => foodCategoryNames.includes(c.title));
+        const cafeteria = allCategories.filter(c => cafeteriaCategoryNames.includes(c.title));
         const drinks = allCategories.filter(c => drinkCategoryNames.includes(c.title));
 
         setFoodCategories(food);
+        setCafeteriaCategories(cafeteria);
         setDrinkCategories(drinks);
         setTables(tableItems);
       } catch (error) {
@@ -501,6 +528,79 @@ const MenuSection = () => {
               </Card>
             ))}
           </div>
+        </div>
+        )}
+
+        {/* Cafetería Section */}
+        {cafeteriaCategories.length > 0 && (
+        <div id="cafeteria" className="mt-20 space-y-20">
+          {cafeteriaCategories.map((category) => (
+            <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
+              <div className="flex flex-col items-center">
+                {category.image ? (
+                  <div className="relative h-80 md:h-[500px] w-full max-w-4xl rounded-2xl overflow-hidden group mb-6">
+                    <img
+                      src={category.image}
+                      alt={category.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+                  </div>
+                ) : null}
+                <div className="text-center">
+                  <h3 className="font-display text-4xl md:text-5xl text-primary mb-2">
+                    {category.title}
+                  </h3>
+                  {category.subtitle && (
+                    <p className="text-sm text-white font-heading uppercase tracking-wider">
+                      {category.subtitle}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {category.items.map((item) => (
+                  <Card
+                    key={item.name}
+                    onClick={() => handleImageClick(item.image, item.name)}
+                    className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
+                      item.image ? 'cursor-pointer' : 'cursor-default'
+                    } ${
+                      item.highlight ? 'border-primary/30' : ''
+                    }`}
+                  >
+                    <CardContent className="p-5">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
+                                {item.name}
+                              </h4>
+                              {item.highlight && (
+                                <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full">
+                                  Popular
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-white text-xs mt-1">
+                              {item.description}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="font-heading text-lg text-primary font-semibold whitespace-nowrap">
+                            {item.price}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
         )}
 

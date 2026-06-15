@@ -1,5 +1,6 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/marquito/11once.cl/
-    - /bin/cp -R dist/* $DEPLOYPATH
+    - export DEPLOYPATH=/home/marquito/11once.cl/web
+    - mkdir -p $DEPLOYPATH
+    - /bin/cp -R dist/. $DEPLOYPATH/

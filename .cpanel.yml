@@ -6,3 +6,4 @@ deployment:
     - /bin/cp index.html $DEPLOYPATH/
     - /bin/cp -R assets $DEPLOYPATH/
     - /bin/cp .htaccess favicon.ico robots.txt placeholder.svg $DEPLOYPATH/
+    - /bin/cp -R correos $DEPLOYPATH/

@@ -20,8 +20,8 @@ const navLinks = [
     { label: "Tablas Para Picar", href: "/#tablas", isHash: true },
     { label: "Cafetería", href: "/#cafeteria", isHash: true },
     { label: "Promo 2X", href: "/#promo-2x", isHash: true },
-    { label: "Cócteles", href: "/#cócteles", isHash: true },
     { label: "Bebestibles", href: "/#tragos", isHash: true },
+    { label: "Cócteles", href: "/#cócteles", isHash: true },
   ] },
   { label: "Sobre nosotros", href: "/sobre-nosotros", isHash: false },
 ];

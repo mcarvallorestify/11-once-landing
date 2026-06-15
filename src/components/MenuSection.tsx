@@ -60,7 +60,7 @@ const categoryConfig: Record<string, { image?: string; subtitle?: string; otrosu
   "Pa' La Bendi": { image: images.palabendi, subtitle: "Para los Pequeños" },
   "Promo 2X": { image: images.promo2x, subtitle: "Oferta Especial - De Martes a Jueves Todo el día y Viernes de 18:00 a 21:00 hrs" },
   "Cócteles": { image: images.moscowmule, subtitle: "Mojitos y Moscow Mule" },
-  "Pisco y Gin": { image: images.ginkantal, subtitle: "Destilados Premium" },
+  "Destilados": { image: images.ginkantal, subtitle: "Destilados Premium" },
   "Whisky y Ron": { image: images.whiskyron, subtitle: "Espíritus Selectos" },
   "Vinos y Sours": { image: images.copasangria, subtitle: "Sangrías y Sours Nacionales" },
   "Spritz": { image: images.copa1, subtitle: "Aperitivos Refrescantes" },
@@ -108,7 +108,7 @@ function createCategoryIdToMenuNameMap(categories: FudoCategory[]): Map<number, 
     13: "Pa' La Bendi",     // Pa La Bendi
     18: "Promo 2X",         // Happy hours
     14: "Cócteles",         // Cocktails
-    21: "Pisco y Gin",      // Destilados
+    21: "Destilados",      // Destilados
     20: "Cervezas y Bebidas", // Bar
     15: "Cervezas y Bebidas", // Bebidas (subcategoría de Bar)
     16: "Cervezas y Bebidas", // Jugos Naturales (subcategoría de Bar)
@@ -123,10 +123,14 @@ function createCategoryIdToMenuNameMap(categories: FudoCategory[]): Map<number, 
     idToMenuName.set(Number(id), menuName);
   });
 
-  // Luego, procesar subcategorías (categorías con productCategoryId no null)
+  const directMappingIds = new Set(Object.keys(directMapping).map(Number));
+
+  // Subcategorías heredan del padre solo si no tienen mapeo directo
   categories.forEach(category => {
-    if (category.productCategoryId !== null) {
-      // Si es una subcategoría, usar el mapeo del padre
+    if (
+      category.productCategoryId !== null &&
+      !directMappingIds.has(category.id)
+    ) {
       const parentMenuName = idToMenuName.get(category.productCategoryId);
       if (parentMenuName) {
         idToMenuName.set(category.id, parentMenuName);
@@ -171,12 +175,12 @@ function organizeProductsByCategory(
 
   const drinkCategoryNames = [
     "Promo 2X",
-    "Cócteles",
-    "Pisco y Gin",
+    "Destilados",
     "Whisky y Ron",
     "Vinos y Sours",
     "Spritz",
     "Cervezas y Bebidas",
+    "Cócteles",
   ];
 
   const cafeteriaCategoryNames = ["Cafetería"];
@@ -447,12 +451,12 @@ const MenuSection = () => {
 
         const drinkCategoryNames = [
           "Promo 2X",
-          "Cócteles",
-          "Pisco y Gin",
+          "Destilados",
           "Whisky y Ron",
           "Vinos y Sours",
           "Spritz",
           "Cervezas y Bebidas",
+          "Cócteles",
         ];
 
         const cafeteriaCategoryNames = ["Cafetería"];

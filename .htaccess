@@ -1,21 +1,9 @@
-# Bloquear archivos del repo si existen en disco (git pull los restaura)
-<Files "README.md">
-  Require all denied
-</Files>
-
-<FilesMatch "\.(md|json|yml|yaml|ts|tsx|jsx|env|lock|log|sh|gitignore)$">
-  Require all denied
-</FilesMatch>
-
-# SPA — React Router
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  RewriteRule ^\.git - [F,L]
-  RewriteRule ^(src|node_modules|dist|public)(/|$) - [F,L]
-
   RewriteRule ^index\.html$ - [L]
+
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]

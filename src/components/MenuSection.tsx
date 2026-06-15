@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -7,8 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Users } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { images } from "@/constants/images";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { getProducts, getCategories, formatPrice, type FudoProduct, type FudoCategory } from "@/services/fudoApi";
 
 interface MenuItem {
@@ -21,6 +26,7 @@ interface MenuItem {
 
 interface MenuCategory {
   title: string;
+  slug?: string;
   subtitle?: string;
   otrosubtitulo?: string;
   image: string | null;
@@ -223,13 +229,196 @@ function organizeProductsByCategory(
   return allCategories;
 }
 
+function categoryToId(title: string): string {
+  return title.toLowerCase().replace(/'/g, "").replace(/\s+/g, "-");
+}
+
+interface MenuCategoryAccordionProps {
+  categories: MenuCategory[];
+  openId: string;
+  onOpenChange: (id: string) => void;
+  onImageClick: (image: string | null, title: string) => void;
+}
+
+function MenuItemRow({
+  item,
+  onImageClick,
+}: {
+  item: MenuItem;
+  onImageClick: (image: string | null, title: string) => void;
+}) {
+  const hasImage = !!item.image;
+
+  return (
+    <button
+      type="button"
+      onClick={() => hasImage && onImageClick(item.image, item.name)}
+      className={`w-full text-left px-4 md:px-6 py-4 border-b border-border/30 last:border-b-0 transition-colors hover:bg-primary/5 flex gap-3 md:gap-4 items-start ${
+        hasImage ? "cursor-pointer" : "cursor-default"
+      }`}
+    >
+      {hasImage && (
+        <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-lg overflow-hidden ring-1 ring-border/50">
+          <img
+            src={item.image!}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-4">
+          <h4 className="font-heading text-sm md:text-base text-foreground uppercase tracking-wide flex-1 min-w-0">
+            {item.name}
+            {item.highlight && (
+              <span className="ml-2 px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full normal-case">
+                Popular
+              </span>
+            )}
+          </h4>
+          <span className="font-heading text-base md:text-lg text-primary font-semibold whitespace-nowrap shrink-0">
+            {item.price}
+          </span>
+        </div>
+        {item.description ? (
+          <div className="mt-2 pr-2">
+            <p className="text-[10px] md:text-xs text-primary/70 font-heading uppercase tracking-wider mb-1">
+              Ingredientes
+            </p>
+            <p className="text-white/65 text-xs md:text-sm leading-relaxed">
+              {item.description}
+            </p>
+          </div>
+        ) : null}
+      </div>
+    </button>
+  );
+}
+
+function MenuCategoryAccordion({
+  categories,
+  openId,
+  onOpenChange,
+  onImageClick,
+}: MenuCategoryAccordionProps) {
+  return (
+    <Accordion
+      type="single"
+      collapsible
+      value={openId}
+      onValueChange={(value) => onOpenChange(value)}
+      className="space-y-3"
+    >
+      {categories.map((category) => {
+        const id = category.slug ?? categoryToId(category.title);
+        const isOpen = openId === id;
+
+        return (
+          <AccordionItem
+            key={category.title}
+            value={id}
+            id={id}
+            className={`border-0 rounded-xl overflow-hidden transition-all duration-300 ${
+              isOpen
+                ? "ring-1 ring-primary/40 shadow-lg shadow-primary/5"
+                : "ring-1 ring-border/40"
+            }`}
+          >
+            <AccordionTrigger className="hover:no-underline px-0 py-0 [&>svg]:hidden group">
+              <div className="flex w-full items-stretch min-h-[88px] md:min-h-[100px]">
+                {category.image ? (
+                  <div className="relative w-24 md:w-32 shrink-0 overflow-hidden">
+                    <img
+                      src={category.image}
+                      alt=""
+                      className={`absolute inset-0 w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                        category.title === "Spritz" ? "object-contain bg-card" : "object-cover"
+                      }`}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-card/80" />
+                  </div>
+                ) : (
+                  <div className="w-2 shrink-0 bg-primary" />
+                )}
+                <div className="flex flex-1 items-center justify-between gap-3 px-4 md:px-6 py-4 bg-card">
+                  <div className="text-left min-w-0">
+                    <h3 className="font-display text-xl md:text-2xl text-primary leading-tight">
+                      {category.title}
+                    </h3>
+                    {category.subtitle && (
+                      <p className="text-xs md:text-sm text-white/60 font-heading uppercase tracking-wider mt-1 line-clamp-2">
+                        {category.subtitle}
+                      </p>
+                    )}
+                    {category.otrosubtitulo && (
+                      <p className="text-xs text-white/50 mt-1 line-clamp-1">{category.otrosubtitulo}</p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span className="hidden sm:inline text-xs text-white/40 font-heading uppercase tracking-wider">
+                      {category.items.length} {category.items.length === 1 ? "item" : "items"}
+                    </span>
+                    <div
+                      className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        isOpen ? "bg-primary text-primary-foreground rotate-180" : "bg-primary/10 text-primary"
+                      }`}
+                    >
+                      <ChevronDown className="w-5 h-5" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="bg-card/50 border-t border-border/30">
+              <div className="divide-y divide-border/20">
+                {category.items.map((item) => (
+                  <MenuItemRow key={item.name} item={item} onImageClick={onImageClick} />
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
+  );
+}
+
 const MenuSection = () => {
   const [selectedImage, setSelectedImage] = useState<{ src: string; title: string } | null>(null);
   const [foodCategories, setFoodCategories] = useState<MenuCategory[]>([]);
   const [cafeteriaCategories, setCafeteriaCategories] = useState<MenuCategory[]>([]);
   const [drinkCategories, setDrinkCategories] = useState<MenuCategory[]>([]);
-  const [tables, setTables] = useState<TableItem[]>([]);
+  const [tableCategory, setTableCategory] = useState<MenuCategory | null>(null);
   const [loading, setLoading] = useState(true);
+  const [openCategoryId, setOpenCategoryId] = useState("");
+
+  useEffect(() => {
+    const hashAliases: Record<string, string> = {
+      cafeteria: "cafetería",
+    };
+
+    const syncHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash && hash !== "menu" && hash !== "tragos") {
+        setOpenCategoryId(hashAliases[hash] ?? hash);
+      }
+    };
+
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, []);
+
+  useEffect(() => {
+    if (!openCategoryId) return;
+    const el = document.getElementById(openCategoryId);
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, [openCategoryId, loading]);
 
   useEffect(() => {
     async function loadMenuData() {
@@ -240,11 +429,10 @@ const MenuSection = () => {
         ]);
 
         const allCategories = organizeProductsByCategory(products, categories);
-        
-        // Obtener productos de tablas directamente por productCategoryId: 9
-        const tableProducts = products.filter(p => p.productCategoryId === 9);
+
+        const tableProducts = products.filter((p) => p.productCategoryId === 9);
         const tableItems = mapProductsToTableItems(tableProducts);
-        
+
         const foodCategoryNames = [
           "Menú almuerzo",
           "Smash Burgers",
@@ -269,16 +457,26 @@ const MenuSection = () => {
 
         const cafeteriaCategoryNames = ["Cafetería"];
 
-        const food = allCategories.filter(c => foodCategoryNames.includes(c.title));
-        const cafeteria = allCategories.filter(c => cafeteriaCategoryNames.includes(c.title));
-        const drinks = allCategories.filter(c => drinkCategoryNames.includes(c.title));
+        setFoodCategories(allCategories.filter((c) => foodCategoryNames.includes(c.title)));
+        setCafeteriaCategories(allCategories.filter((c) => cafeteriaCategoryNames.includes(c.title)));
+        setDrinkCategories(allCategories.filter((c) => drinkCategoryNames.includes(c.title)));
 
-        setFoodCategories(food);
-        setCafeteriaCategories(cafeteria);
-        setDrinkCategories(drinks);
-        setTables(tableItems);
+        if (tableItems.length > 0) {
+          setTableCategory({
+            title: "Tablas Para Picar Con Ganas",
+            slug: "tablas",
+            subtitle: "Perfectas para compartir con amigos. Quesos, aceitunas, tomate cherry, papas bravas y salsas.",
+            image: images.tfilete,
+            items: tableItems.map((t) => ({
+              name: t.name,
+              description: t.description,
+              price: t.price,
+              image: t.image,
+            })),
+          });
+        }
       } catch (error) {
-        console.error('Error al cargar el menú:', error);
+        console.error("Error al cargar el menú:", error);
       } finally {
         setLoading(false);
       }
@@ -288,416 +486,108 @@ const MenuSection = () => {
   }, []);
 
   const handleImageClick = (image: string | null, title: string) => {
-    // Si la imagen es null, no mostrar nada
     if (image) {
-    setSelectedImage({ src: image, title });
+      setSelectedImage({ src: image, title });
     }
   };
 
+  const handleCategoryOpen = (id: string) => {
+    setOpenCategoryId(id);
+    if (id) {
+      window.history.replaceState(null, "", `#${id}`);
+    }
+  };
+
+  const tableAccordionCategory = tableCategory
+    ? [{ ...tableCategory, title: "Tablas Para Picar Con Ganas" }]
+    : [];
+
   return (
     <section id="menu" className="py-20 bg-background">
-      <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="font-display text-6xl md:text-7xl text-primary mb-4">
+      <div className="container mx-auto px-4 max-w-3xl">
+        <div className="text-center mb-12">
+          <h2 className="font-display text-5xl md:text-7xl text-primary mb-4">
             Nuestra Carta
           </h2>
-          <p className="text-white text-lg max-w-xl mx-auto">
-            Sabores audaces para paladares exigentes. Cada plato preparado con ingredientes frescos y mucho amor.
+          <p className="text-white/70 text-base md:text-lg max-w-xl mx-auto">
+            Toca una categoría para ver los productos
           </p>
         </div>
 
-        {/* Food Categories */}
         {loading ? (
           <div className="text-center py-20">
             <p className="text-white text-lg">Cargando menú...</p>
           </div>
         ) : (
-        <div className="space-y-20">
-          {foodCategories.map((category, categoryIndex) => {
-            // Special layout for Smash Burgers
-            if (category.title === "Smash Burgers") {
-              return (
-                <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
-                  {/* Centered Image and Title */}
-                  <div className="flex flex-col items-center">
-                        {category.image ? (
-                          <div className="relative h-80 md:h-[500px] w-full max-w-4xl rounded-2xl overflow-hidden group mb-6">
-                            <img 
-                              src={category.image} 
-                              alt={category.title}
-                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                          </div>
-                        ) : null}
-                        <div className="text-center">
-                          <h3 className="font-display text-4xl md:text-5xl text-primary mb-2">
-                            {category.title}
-                          </h3>
-                          {category.subtitle && (
-                            <p className="text-sm text-white font-heading uppercase tracking-wider">
-                              {category.subtitle}
-                            </p>
-                          )}
-                          {category.otrosubtitulo && (
-                            <p className="text-lg md:text-xl text-white mt-2 font-semibold">
-                              {category.otrosubtitulo}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                  {/* Menu Items in 4 columns */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {category.items.map((item) => (
-                      <Card 
-                        key={item.name}
-                        onClick={() => handleImageClick(item.image, item.name)}
-                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                          item.image ? 'cursor-pointer' : 'cursor-default'
-                        } ${
-                          item.highlight ? 'border-primary/30' : ''
-                        }`}
-                      >
-                        <CardContent className="p-5">
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
-                                    {item.name}
-                                  </h4>
-                                  {item.highlight && (
-                                    <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full">
-                                      Popular
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-white text-xs mt-1">
-                                  {item.description}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-end gap-2">
-                              <span className="font-heading text-lg text-primary font-semibold whitespace-nowrap">
-                                {item.price}
-                              </span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              );
-            }
-
-            // Regular layout for other categories - usando grid layout
-            return (
-              <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
-                {/* Centered Image and Title */}
-                <div className="flex flex-col items-center">
-                  {category.image ? (
-                    <div className="relative h-80 md:h-[500px] w-full max-w-4xl rounded-2xl overflow-hidden group mb-6">
-                      <img 
-                        src={category.image} 
-                        alt={category.title}
-                        className={`w-full h-full ${
-                          category.title === "Spritz" 
-                            ? "object-contain bg-background" 
-                            : "object-cover"
-                        } transition-transform duration-700 group-hover:scale-110`}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                    </div>
-                  ) : null}
-                  <div className="text-center">
-                    <h3 className="font-display text-4xl md:text-5xl text-primary mb-2">
-                      {category.title}
-                    </h3>
-                    {category.subtitle && (
-                      <p className="text-sm text-white font-heading uppercase tracking-wider">
-                        {category.subtitle}
-                      </p>
-                    )}
-                    {category.otrosubtitulo && (
-                      <p className="text-lg md:text-xl text-white mt-2 font-semibold">
-                        {category.otrosubtitulo}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Menu Items in grid layout */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {category.items.map((item) => (
-                    <Card 
-                      key={item.name}
-                      onClick={() => handleImageClick(item.image, item.name)}
-                      className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                        item.image ? 'cursor-pointer' : 'cursor-default'
-                      } ${
-                        item.highlight ? 'border-primary/30' : ''
-                      }`}
-                    >
-                      <CardContent className="p-5">
-                        <div className="flex flex-col gap-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
-                                  {item.name}
-                                </h4>
-                                {item.highlight && (
-                                  <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full">
-                                    Popular
-                                  </span>
-                                )}
-                              </div>
-                              <p className="text-white text-xs mt-1">
-                                {item.description}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <span className="font-heading text-lg text-primary font-semibold whitespace-nowrap">
-                              {item.price}
-                            </span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+          <div className="space-y-16">
+            {/* Comida */}
+            {foodCategories.length > 0 && (
+              <div>
+                <p className="text-primary font-heading uppercase tracking-[0.25em] text-xs mb-4 text-center">
+                  Comida
+                </p>
+                <MenuCategoryAccordion
+                  categories={foodCategories}
+                  openId={openCategoryId}
+                  onOpenChange={handleCategoryOpen}
+                  onImageClick={handleImageClick}
+                />
               </div>
-            );
-          })}
-        </div>
-        )}
+            )}
 
-        {/* Tables Section */}
-        {tables.length > 0 && (
-        <div id="tablas" className="mt-20">
-          <div className="text-center mb-16">
-            <span className="text-primary font-heading uppercase tracking-[0.3em] text-sm mb-4 block">
-              Para Compartir
-            </span>
-            <h2 className="font-display text-6xl md:text-7xl text-foreground mb-4">
-              Tablas pá picar con ganas
-            </h2>
-            <p className="text-white text-lg max-w-xl mx-auto">
-              Perfectas para compartir con amigos. Todas incluyen quesos, aceitunas, tomate cherry, papas bravas y salsas.
-            </p>
-          </div>
+            {/* Tablas */}
+            {tableAccordionCategory.length > 0 && (
+              <div id="tablas">
+                <p className="text-primary font-heading uppercase tracking-[0.25em] text-xs mb-4 text-center">
+                  Para compartir
+                </p>
+                <MenuCategoryAccordion
+                  categories={tableAccordionCategory}
+                  openId={openCategoryId}
+                  onOpenChange={handleCategoryOpen}
+                  onImageClick={handleImageClick}
+                />
+              </div>
+            )}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {tables.map((table) => (
-              <Card 
-                key={table.name}
-                onClick={() => table.image ? handleImageClick(table.image, table.name) : undefined}
-                className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                  table.image ? 'cursor-pointer' : 'cursor-default'
-                }`}
-              >
-                <CardContent className="p-5">
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap mb-2">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <Users className="w-5 h-5 text-primary" />
-                          </div>
-                          <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
-                            {table.name}
-                          </h4>
-                        </div>
-                        <p className="text-white text-xs mt-1">
-                          {table.description}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="pt-3 border-t border-border/50 flex justify-end">
-  <span className="font-heading text-lg text-primary font-semibold">
-    {table.price}
-  </span>
-</div>
+            {/* Cafetería */}
+            {cafeteriaCategories.length > 0 && (
+              <div id="cafeteria">
+                <p className="text-primary font-heading uppercase tracking-[0.25em] text-xs mb-4 text-center">
+                  Cafetería
+                </p>
+                <MenuCategoryAccordion
+                  categories={cafeteriaCategories}
+                  openId={openCategoryId}
+                  onOpenChange={handleCategoryOpen}
+                  onImageClick={handleImageClick}
+                />
+              </div>
+            )}
 
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-        )}
-
-        {/* Cafetería Section */}
-        {cafeteriaCategories.length > 0 && (
-        <div id="cafeteria" className="mt-20 space-y-20">
-          {cafeteriaCategories.map((category) => (
-            <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
-              <div className="flex flex-col items-center">
-                {category.image ? (
-                  <div className="relative h-80 md:h-[500px] w-full max-w-4xl rounded-2xl overflow-hidden group mb-6">
-                    <img
-                      src={category.image}
-                      alt={category.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                  </div>
-                ) : null}
-                <div className="text-center">
+            {/* Tragos */}
+            {drinkCategories.length > 0 && (
+              <div id="tragos">
+                <div className="text-center mb-8">
                   <h3 className="font-display text-4xl md:text-5xl text-primary mb-2">
-                    {category.title}
+                    Tragos
                   </h3>
-                  {category.subtitle && (
-                    <p className="text-sm text-white font-heading uppercase tracking-wider">
-                      {category.subtitle}
-                    </p>
-                  )}
+                  <p className="text-white/60 text-sm md:text-base">
+                    Cócteles, destilados y bebestibles
+                  </p>
                 </div>
+                <MenuCategoryAccordion
+                  categories={drinkCategories}
+                  openId={openCategoryId}
+                  onOpenChange={handleCategoryOpen}
+                  onImageClick={handleImageClick}
+                />
               </div>
-
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {category.items.map((item) => (
-                  <Card
-                    key={item.name}
-                    onClick={() => handleImageClick(item.image, item.name)}
-                    className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                      item.image ? 'cursor-pointer' : 'cursor-default'
-                    } ${
-                      item.highlight ? 'border-primary/30' : ''
-                    }`}
-                  >
-                    <CardContent className="p-5">
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
-                                {item.name}
-                              </h4>
-                              {item.highlight && (
-                                <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full">
-                                  Popular
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-white text-xs mt-1">
-                              {item.description}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-end gap-2">
-                          <span className="font-heading text-lg text-primary font-semibold whitespace-nowrap">
-                            {item.price}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+            )}
+          </div>
         )}
-
-        {/* Drinks Section */}
-        <div id="tragos" className="mt-20">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-6xl md:text-7xl text-primary mb-4">
-              Tragos
-            </h2>
-            <p className="text-white text-lg max-w-xl mx-auto">
-              Bebidas para acompañar tu experiencia. Desde cócteles clásicos hasta destilados premium.
-            </p>
-          </div>
-
-          <div className="space-y-20">
-            {drinkCategories.map((category) => {
-              return (
-                <div id={category.title.toLowerCase().replace(/'/g, '').replace(/\s+/g, '-')} key={category.title} className="space-y-12">
-                  {/* Centered Image and Title */}
-                  <div className="flex flex-col items-center">
-                      {category.image ? (
-                        <div className={`relative h-80 md:h-[500px] w-full max-w-4xl rounded-2xl overflow-hidden group mb-6 ${
-                          category.title === "Spritz" ? "bg-background" : ""
-                        }`}>
-                          <img 
-                            src={category.image} 
-                            alt={category.title}
-                            className={`w-full h-full ${
-                              category.title === "Spritz" 
-                                ? "object-contain" 
-                                : "object-cover"
-                            } transition-transform duration-700 group-hover:scale-110`}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-                        </div>
-                      ) : null}
-                    <div className="text-center">
-                      <h3 className="font-display text-4xl md:text-5xl text-primary mb-2">
-                        {category.title}
-                      </h3>
-                      {category.subtitle && (
-                        <p className="text-sm text-white font-heading uppercase tracking-wider">
-                          {category.subtitle}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Menu Items in grid layout */}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {category.items.map((item) => (
-                      <Card 
-                        key={item.name}
-                        onClick={() => handleImageClick(item.image, item.name)}
-                        className={`bg-card border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 ${
-                          item.image ? 'cursor-pointer' : 'cursor-default'
-                        } ${
-                          item.highlight ? 'border-primary/30' : ''
-                        }`}
-                      >
-                        <CardContent className="p-5">
-                          <div className="flex flex-col gap-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <h4 className="font-heading text-base text-foreground uppercase tracking-wide">
-                                    {item.name}
-                                  </h4>
-                                  {item.highlight && (
-                                    <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded-full">
-                                      Popular
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-white text-xs mt-1">
-                                  {item.description}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-end gap-2">
-                              <span className="font-heading text-lg text-primary font-semibold whitespace-nowrap">
-                                {item.price}
-                              </span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </div>
 
-      {/* Image Modal */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -705,8 +595,8 @@ const MenuSection = () => {
             <DialogDescription asChild>
               {selectedImage && (
                 <div className="flex justify-center items-center mt-2">
-                  <img 
-                    src={selectedImage.src} 
+                  <img
+                    src={selectedImage.src}
                     alt={selectedImage.title}
                     className="max-w-full max-h-[70vh] w-auto h-auto rounded-lg object-contain"
                   />

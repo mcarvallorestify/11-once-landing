@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/marquito/11once.cl/web
+    - export DEPLOYPATH=/home/marquito/11once.restify.cl
     - mkdir -p $DEPLOYPATH
     - /bin/cp index.html $DEPLOYPATH/
     - /bin/cp -R assets $DEPLOYPATH/

@@ -6,3 +6,8 @@ deployment:
     - /bin/cp index.html $DEPLOYPATH/
     - /bin/cp -R assets $DEPLOYPATH/
     - /bin/cp .htaccess favicon.ico robots.txt placeholder.svg $DEPLOYPATH/
+    - export DEPLOYPATH2=/home/marquito/11once.cl/web
+    - mkdir -p $DEPLOYPATH2
+    - /bin/cp index.html $DEPLOYPATH2/
+    - /bin/cp -R assets $DEPLOYPATH2/
+    - /bin/cp .htaccess favicon.ico robots.txt placeholder.svg $DEPLOYPATH2/
